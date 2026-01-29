@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if program %}Редактирование программы{% else %}Новая программа{% endif %}</h2>
+
+<form method="post" action="{{ action_url }}">
+    <div class="form-row">
+        <label>Название программы *</label>
+        <input type="text" name="name" required
+               value="{{ program.name if program else '' }}">
+    </div>
+    <div class="form-row">
+        <label>Категория (группа)</label>
+        <input type="text" name="category"
+               value="{{ program.category if program else '' }}"
+               placeholder="Пищевая промышленность, образование и т.п.">
+    </div>
+    <div class="form-row">
+        <label>Часы теории</label>
+        <input type="number" name="theory_hours" min="0"
+               value="{{ program.theory_hours if program and program.theory_hours is not none else '' }}">
+    </div>
+    <div class="form-row">
+        <label>Часы экзамена</label>
+        <input type="number" name="exam_hours" min="0"
+               value="{{ program.exam_hours if program and program.exam_hours is not none else '' }}">
+    </div>
+
+    <button class="btn btn-success" type="submit">{{ submit_label }}</button>
+</form>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Слушатели</h2>
+<p><a class="btn btn-primary" href="{{ url_for('new_participant') }}">Добавить слушателя</a></p>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>ФИО</th>
+        <th>ИИН</th>
+        <th>ЛМК</th>
+        <th>Место работы</th>
+        <th>Должность</th>
+        <th>Вид деятельности</th>
+        <th>Изменить</th>
+        <th>Удалить</th>
+    </tr>
+    {% for p in participants %}
+    <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.full_name }}</td>
+        <td>{{ p.iin or "" }}</td>
+        <td>{{ p.lmk_number or "" }}</td>
+        <td>{{ p.workplace or "" }}</td>
+        <td>{{ p.position or "" }}</td>
+        <td>{{ p.activity_type or "" }}</td>
+        <td>
+            <a class="btn btn-secondary"
+               href="{{ url_for('edit_participant', participant_id=p.id) }}">Изменить</a>
+        </td>
+        <td>
+            <form method="post"
+                  action="{{ url_for('delete_participant', participant_id=p.id) }}"
+                  onsubmit="return confirm('Удалить слушателя и все его обучения?');">
+                <button class="btn btn-danger" type="submit">X</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

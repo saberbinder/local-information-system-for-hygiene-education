@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Гигиеническое обучение</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        nav a { margin-right: 15px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 5px 8px; font-size: 14px; }
+        th { background: #f0f0f0; }
+        .btn {
+            padding: 4px 8px;
+            border: 1px solid #333;
+            text-decoration: none;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .btn-primary { background: #007bff; color: #fff; }
+        .btn-secondary { background: #6c757d; color: #fff; }
+        .btn-success { background: #28a745; color: #fff; }
+        .btn-danger { background: #dc3545; color: #fff; }
+        .form-row { margin-bottom: 8px; }
+        label { display: inline-block; width: 180px; }
+        input[type="text"], input[type="number"], input[type="date"], select {
+            width: 250px;
+        }
+        @media print {
+        nav, hr, footer { display: none !important; }
+        body { margin: 0; }
+    }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="{{ url_for('list_trainings') }}">Обучение/экзамены</a>
+    <a href="{{ url_for('list_participants') }}">Слушатели</a>
+    <a href="{{ url_for('list_programs') }}">Программы</a>
+    <a href="{{ url_for('journal') }}">Журнал</a>
+</nav>
+<hr>
+{% block content %}{% endblock %}
+<footer style="margin-top: 40px; text-align: center; font-size: 11px; color: #777;">
+    Локальная информационная система гигиенического обучения<br>
+    Версия v1.0 (stable) · 2025<br>
+    Разработка: А. Бисеналин
+</footer>
+</body>
+</html>

@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    /* Параметры печати */
+    @page {
+        size: A4 portrait;
+        margin: 10mm;
+    }
+
+    @media print {
+        nav, hr, #print-btn {
+            display: none !important;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .page-wrapper {
+            margin: 0;
+            padding: 0;
+        }
+    }
+
+    .page-wrapper {
+        display: flex;
+        justify-content: center;
+    }
+
+    .a4-page {
+        width: 190mm;
+        min-height: 270mm;
+        border: 1px solid #000;
+        box-sizing: border-box;
+        padding: 15mm 15mm 14mm 15mm;
+        margin-top: 5mm;
+        font-family: "Times New Roman", serif;
+    }
+
+    /* Логотип */
+    .logo-block {
+        text-align: center;
+        margin-bottom: 3mm;
+    }
+    .logo-block img {
+        max-height: 18mm;
+    }
+
+    /* Шапка организации */
+    .org-header {
+        text-align: center;
+        font-size: 13pt;
+        margin-bottom: 5mm;
+        line-height: 1.3;
+        font-weight: bold;
+    }
+
+    /* Заголовки */
+    .cert-title {
+        text-align: center;
+        font-size: 16pt;
+        font-weight: bold;
+        margin-top: 20mm; /* Опущено на два абзаца */
+        margin-bottom: 3mm;
+        text-transform: uppercase;
+    }
+
+    .cert-subtitle {
+        text-align: center;
+        font-size: 14pt;
+        font-weight: bold;
+        margin-bottom: 6mm;
+        text-transform: uppercase;
+    }
+
+    /* Основной текст */
+    .cert-body {
+        font-size: 11.3pt;
+        line-height: 1.42;
+        text-align: justify;
+    }
+
+    .cert-body p {
+        margin: 0 0 4mm 0;
+    }
+
+    .cert-field-label {
+        font-weight: bold;
+    }
+
+    /* Название программы */
+    .program-block {
+        text-align: center;
+        margin: 4mm 0 6mm 0;
+    }
+    .program-name {
+        font-weight: bold;
+        font-size: 12.5pt;
+    }
+
+    /* Подписи */
+    .cert-footer {
+        margin-top: 15mm;
+        font-size: 11pt;
+    }
+
+    .cert-footer-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8mm;
+    }
+
+    .cert-footer-left {
+        width: 75%;
+    }
+    .cert-footer-right {
+        width: 20%;
+        text-align: right;
+    }
+
+    /* QR-блок */
+    .qr-block {
+        margin-top: 40mm;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 6mm;
+    }
+
+    .qr-block img {
+        width: 28mm;
+        height: 28mm;
+    }
+
+    .qr-caption {
+        font-size: 9pt;
+        max-width: 70mm;
+        text-align: right;
+    }
+
+    /* Блок подписи — без таблиц, без съезжаний */
+    .sign-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 15mm;
+    }
+
+    .sign-left {
+        white-space: nowrap; /* запрещаем перенос */
+        font-size: 11pt;
+    }
+
+    .sign-right{
+        width: 20%;
+        text-align: right;
+        position: relative;
+        top: 10mm;           /* ← опускает М.П. вниз */
+    }
+
+
+
+
+    .sign-label {
+        margin-right: 6px;
+    }
+
+    .line {
+        display: inline-block;
+        border-bottom: 1px solid #000;
+        height: 1.3em;
+        vertical-align: bottom;
+    }
+
+    .line-name {
+        width: 75mm;   /* место для ФИО */
+        margin-right: 6px;
+    }
+
+    .line-sign {
+        width: 30mm;   /* подпись */
+        margin-left: 6px;
+    }
+
+    .slash {
+        margin: 0 6px;
+    }
+
+</style>
+
+<div class="page-wrapper">
+    <div class="a4-page">
+
+        <!-- ЛОГОТИП -->
+        <div class="logo-block">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Логотип">
+        </div>
+
+        <!-- ШАПКА -->
+        <div class="org-header">
+            КГП «ПОЛИКЛИНИКА № 2 ГОРОДА КОСТАНАЙ»<br>
+            г. Костанай, ул. М. Хакимжановой, 56А
+        </div>
+
+        <!-- ЗАГОЛОВКИ -->
+        <div class="cert-title">СВИДЕТЕЛЬСТВО</div>
+        <div class="cert-subtitle">О ПРОХОЖДЕНИИ ГИГИЕНИЧЕСКОГО ОБУЧЕНИЯ</div>
+
+        <!-- ОСНОВНОЙ ТЕКСТ -->
+        <div class="cert-body">
+            <p>
+                Настоящим подтверждается, что
+                <span class="cert-field-label">{{ training.participant.full_name }}</span>,
+                ИИН: {{ training.participant.iin or "____________" }},
+                работающий(ая) в организации
+                «{{ training.participant.workplace or "____________________" }}»
+                в должности {{ training.participant.position or "____________________" }},
+                прошёл(а) гигиеническое обучение по программе:
+            </p>
+        </div>
+
+        <!-- НАЗВАНИЕ ПРОГРАММЫ -->
+        <div class="program-block">
+            «<span class="program-name">{{ training.program.name }}</span>»
+        </div>
+
+        <!-- ПЕРИОД ОБУЧЕНИЯ -->
+        <p style="text-align: center; margin-top: 4mm;">
+            Период обучения:
+            {% if training.training_start_date and training.training_end_date %}
+                с {{ training.training_start_date.strftime("%d.%m.%Y") }}
+                по {{ training.training_end_date.strftime("%d.%m.%Y") }}.
+            {% else %}
+                ________________________________.
+            {% endif %}
+        </p>
+
+        <!-- РЕЗУЛЬТАТ -->
+        <p style="text-align: center; margin-top: 4mm;">
+            Итоговый экзамен проведён {{ training.exam_date.strftime("%d.%m.%Y") }}.
+            Результат – <span class="cert-field-label">положительный</span>.
+        </p>
+
+        <!-- ДАТА СЛЕДУЮЩЕГО ЭКЗАМЕНА -->
+        {% if training.next_exam_date %}
+        <p style="text-align: center; margin-top: 3mm;">
+            Дата очередного экзамена:
+            {{ training.next_exam_date.strftime("%d.%m.%Y") }}.
+        </p>
+        {% endif %}
+
+        <!-- ПОДПИСИ -->
+        <div class="cert-footer">
+        <div class="sign-row">
+            <div class="sign-left">
+            <span class="sign-label">Гигиенист-эпидемиолог:</span>
+            <span class="line line-name"></span>
+            <span class="slash">/</span>
+            <span class="line line-sign"></span>
+            </div>
+            <div class="sign-right">М.П.</div>
+        </div>
+        </div>
+
+
+
+        <!-- QR-КОД -->
+        {% if qr_image %}
+        <div class="qr-block">
+            <div class="qr-caption">
+                QR-код содержит сведения о прохождении гигиенического обучения.
+            </div>
+            <img src="data:image/png;base64,{{ qr_image }}" alt="QR-код">
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<button id="print-btn" class="btn btn-primary" onclick="window.print()">Печать свидетельства</button>
+
+{% endblock %}

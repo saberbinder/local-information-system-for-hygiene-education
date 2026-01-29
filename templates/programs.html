@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Программы гигиенического обучения</h2>
+<p><a class="btn btn-primary" href="{{ url_for('new_program') }}">Добавить программу</a></p>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Название</th>
+        <th>Категория</th>
+        <th>Часы теории</th>
+        <th>Часы экзамена</th>
+        <th>Изменить</th>
+        <th>Удалить</th>
+    </tr>
+
+    {% for pr in programs %}
+    <tr>
+        <td>{{ pr.id }}</td>
+        <td>{{ pr.name }}</td>
+        <td>{{ pr.category or "" }}</td>
+        <td>{{ pr.theory_hours or "" }}</td>
+        <td>{{ pr.exam_hours or "" }}</td>
+        <td>
+            <a class="btn btn-secondary"
+               href="{{ url_for('edit_program', program_id=pr.id) }}">Изменить</a>
+        </td>
+        <td>
+            <form method="post"
+                  action="{{ url_for('delete_program', program_id=pr.id) }}"
+                  onsubmit="return confirm('Удалить программу и связанные обучения?');">
+                <button class="btn btn-danger" type="submit">X</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

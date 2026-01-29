@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if participant %}Редактирование слушателя{% else %}Новый слушатель{% endif %}</h2>
+
+<form method="post" action="{{ action_url }}">
+    <div class="form-row">
+        <label>ФИО *</label>
+        <input type="text" name="full_name" required
+               value="{{ participant.full_name if participant else '' }}">
+    </div>
+    <div class="form-row">
+        <label>ИИН</label>
+        <input type="text" name="iin"
+               value="{{ participant.iin if participant else '' }}">
+    </div>
+    <div class="form-row">
+        <label>Дата рождения</label>
+        <input type="date" name="birth_date"
+               value="{{ participant.birth_date.strftime('%Y-%m-%d') if participant and participant.birth_date else '' }}">
+    </div>
+    <div class="form-row">
+        <label>Пол</label>
+        <select name="sex">
+            <option value="">--</option>
+            <option value="М" {% if participant and participant.sex == 'М' %}selected{% endif %}>М</option>
+            <option value="Ж" {% if participant and participant.sex == 'Ж' %}selected{% endif %}>Ж</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label>№ ЛМК</label>
+        <input type="text" name="lmk_number"
+               value="{{ participant.lmk_number if participant else '' }}">
+    </div>
+    <div class="form-row">
+        <label>Место работы</label>
+        <input type="text" name="workplace"
+               value="{{ participant.workplace if participant else '' }}">
+    </div>
+    <div class="form-row">
+        <label>Должность</label>
+        <input type="text" name="position"
+               value="{{ participant.position if participant else '' }}">
+    </div>
+    <div class="form-row">
+        <label>Вид деятельности/услуг</label>
+        <input type="text" name="activity_type"
+               value="{{ participant.activity_type if participant else '' }}">
+    </div>
+
+    <button class="btn btn-success" type="submit">{{ submit_label }}</button>
+</form>
+{% endblock %}

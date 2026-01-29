@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if training %}Редактирование обучения / экзамена{% else %}Новое обучение / экзамен{% endif %}</h2>
+
+<form method="post" action="{{ action_url }}">
+    <div class="form-row">
+        <label>Слушатель *</label>
+        <select name="participant_id" required>
+            <option value="">-- выберите --</option>
+            {% for p in participants %}
+            <option value="{{ p.id }}"
+                {% if training and training.participant_id == p.id %}selected{% endif %}>
+                {{ p.full_name }} ({{ p.workplace or '' }})
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label>Программа *</label>
+        <select name="program_id" required>
+            <option value="">-- выберите --</option>
+            {% for pr in programs %}
+            <option value="{{ pr.id }}"
+                {% if training and training.program_id == pr.id %}selected{% endif %}>
+                {{ pr.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label>Дата начала обучения</label>
+        <input type="date" name="training_start_date"
+               value="{{ training.training_start_date.strftime('%Y-%m-%d') if training and training.training_start_date else '' }}">
+    </div>
+    <div class="form-row">
+        <label>Дата окончания обучения</label>
+        <input type="date" name="training_end_date"
+               value="{{ training.training_end_date.strftime('%Y-%m-%d') if training and training.training_end_date else '' }}">
+    </div>
+    <div class="form-row">
+        <label>Дата экзамена *</label>
+        <input type="date" name="exam_date" required
+               value="{{ training.exam_date.strftime('%Y-%m-%d') if training else '' }}">
+    </div>
+
+    <div class="form-row">
+        <label>Всего вопросов *</label>
+        <input type="number" name="questions_total" min="1" required
+               value="{{ training.questions_total if training else '' }}">
+    </div>
+    <div class="form-row">
+        <label>Правильных ответов *</label>
+        <input type="number" name="correct_answers" min="0" required
+               value="{{ training.correct_answers if training else '' }}">
+    </div>
+
+    <button class="btn btn-success" type="submit">{{ submit_label }}</button>
+</form>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Обучение и экзамены</h2>
+<p><a class="btn btn-primary" href="{{ url_for('new_training') }}">Добавить обучение/экзамен</a></p>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>ФИО</th>
+        <th>Программа</th>
+        <th>Дата экзамена</th>
+        <th>% правильных</th>
+        <th>Результат</th>
+        <th>Следующий экзамен</th>
+        <th>Изменить</th>
+        <th>Свидетельство</th>
+        <th>Удалить</th>
+    </tr>
+    {% for t in trainings %}
+    <tr>
+        <td>{{ t.id }}</td>
+        <td>{{ t.participant.full_name }}</td>
+        <td>{{ t.program.name }}</td>
+        <td>{{ t.exam_date.strftime("%d.%m.%Y") }}</td>
+        <td>{{ "%.1f"|format(t.exam_percent) }}</td>
+        <td>{{ t.exam_result }}</td>
+        <td>
+            {% if t.next_exam_date %}
+                {{ t.next_exam_date.strftime("%d.%m.%Y") }}
+            {% endif %}
+        </td>
+        <td>
+            <a class="btn btn-secondary"
+               href="{{ url_for('edit_training', training_id=t.id) }}">Изменить</a>
+        </td>
+        <td>
+            <a class="btn btn-secondary"
+               href="{{ url_for('certificate', training_id=t.id) }}" target="_blank">
+                Открыть
+            </a>
+        </td>
+        <td>
+            <form method="post"
+                  action="{{ url_for('delete_training', training_id=t.id) }}"
+                  onsubmit="return confirm('Удалить эту запись об обучении?');">
+                <button class="btn btn-danger" type="submit">X</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

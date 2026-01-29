@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+    @media print {
+        nav, hr, #journal-print-btn, #journal-excel-btn { display: none !important; }
+        body { margin: 0; }
+    }
+    table.journal {
+        font-size: 11px;
+    }
+</style>
+
+<h2>Журнал учета гигиенического обучения</h2>
+<p>Печатью этой страницы формируется журнал, максимально приближенный к форме Приложения 2 приказа №195.</p>
+
+<table class="journal">
+    <tr>
+        <th>№</th>
+        <th>ФИО слушателя</th>
+        <th>Место работы, должность, вид деятельности/услуг</th>
+        <th>Период обучения</th>
+        <th>Дата экзамена</th>
+        <th>Результат экзамена</th>
+        <th>Дата очередного экзамена</th>
+    </tr>
+
+    {% for t in trainings %}
+    <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ t.participant.full_name }}</td>
+        <td>
+            {{ t.participant.workplace or "" }}<br>
+            {{ t.participant.position or "" }}{% if t.participant.activity_type %}, {{ t.participant.activity_type }}{% endif %}
+        </td>
+        <td>
+            {% if t.training_start_date and t.training_end_date %}
+                {{ t.training_start_date.strftime("%d.%m.%Y") }} –
+                {{ t.training_end_date.strftime("%d.%m.%Y") }}
+            {% endif %}
+        </td>
+        <td>{% if t.exam_date %}{{ t.exam_date.strftime("%d.%m.%Y") }}{% endif %}</td>
+        <td>{{ t.exam_result }} ({{ "%.1f"|format(t.exam_percent) }} %)</td>
+        <td>
+            {% if t.next_exam_date %}
+                {{ t.next_exam_date.strftime("%d.%m.%Y") }}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div style="margin-top: 20px;">
+    <button id="journal-print-btn" class="btn btn-primary" onclick="window.print()">Печать журнала</button>
+    <a id="journal-excel-btn" class="btn btn-secondary" href="{{ url_for('journal_excel') }}">
+        Экспорт в Excel
+    </a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if hygienist %}Редактирование специалиста{% else %}Новый специалист{% endif %}</h2>
+
+<form method="post" action="{{ action_url }}">
+    <div class="form-row">
+        <label>ФИО *</label>
+        <input type="text" name="full_name" required
+               value="{{ hygienist.full_name if hygienist else '' }}">
+    </div>
+    <div class="form-row">
+        <label>Активность *</label>
+        <select name="is_active" required>
+            <option value="yes" {% if not hygienist or hygienist.is_active %}selected{% endif %}>Да</option>
+            <option value="no" {% if hygienist and not hygienist.is_active %}selected{% endif %}>Нет</option>
+        </select>
+    </div>
+
+    <button class="btn btn-success" type="submit">{{ submit_label }}</button>
+</form>
+{% endblock %}

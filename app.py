@@ -115,12 +115,26 @@ class Participant(db.Model):
     )
 
 
+class Hygienist(db.Model):
+    __tablename__ = "hygienists"
+
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(255), nullable=False)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+
+    trainings = db.relationship(
+        "Training",
+        back_populates="hygienist",
+    )
+
+
 class Training(db.Model):
     __tablename__ = "trainings"
 
     id = db.Column(db.Integer, primary_key=True)
     participant_id = db.Column(db.Integer, db.ForeignKey("participants.id"), nullable=False)
     program_id = db.Column(db.Integer, db.ForeignKey("programs.id"), nullable=False)
+    hygienist_id = db.Column(db.Integer, db.ForeignKey("hygienists.id"), nullable=True)
 
     training_start_date = db.Column(db.Date, nullable=True)
     training_end_date = db.Column(db.Date, nullable=True)
@@ -137,6 +151,7 @@ class Training(db.Model):
 
     participant = db.relationship("Participant", back_populates="trainings")
     program = db.relationship("Program", back_populates="trainings")
+    hygienist = db.relationship("Hygienist", back_populates="trainings")
 
 
 # -------------- УТИЛИТЫ ----------------------
@@ -345,6 +360,66 @@ def delete_participant(participant_id):
     return redirect(url_for("list_participants"))
 
 
+# --------- ГИГИЕНИСТЫ-ЭПИДЕМИОЛОГИ ----------
+
+
+@app.route("/hygienists")
+def list_hygienists():
+    hygienists = Hygienist.query.order_by(
+        Hygienist.is_active.desc(),
+        Hygienist.full_name
+    ).all()
+    return render_template("hygienists.html", hygienists=hygienists)
+
+
+@app.route("/hygienists/new", methods=["GET", "POST"])
+def new_hygienist():
+    if request.method == "POST":
+        full_name = request.form.get("full_name")
+        is_active = request.form.get("is_active") == "yes"
+
+        hygienist = Hygienist(
+            full_name=full_name,
+            is_active=is_active,
+        )
+        db.session.add(hygienist)
+        db.session.commit()
+        return redirect(url_for("list_hygienists"))
+
+    return render_template(
+        "hygienist_form.html",
+        hygienist=None,
+        action_url=url_for("new_hygienist"),
+        submit_label="Сохранить",
+    )
+
+
+@app.route("/hygienists/edit/<int:hygienist_id>", methods=["GET", "POST"])
+def edit_hygienist(hygienist_id):
+    hygienist = Hygienist.query.get_or_404(hygienist_id)
+
+    if request.method == "POST":
+        hygienist.full_name = request.form.get("full_name")
+        hygienist.is_active = request.form.get("is_active") == "yes"
+        db.session.commit()
+        return redirect(url_for("list_hygienists"))
+
+    return render_template(
+        "hygienist_form.html",
+        hygienist=hygienist,
+        action_url=url_for("edit_hygienist", hygienist_id=hygienist_id),
+        submit_label="Обновить",
+    )
+
+
+@app.route("/hygienists/delete/<int:hygienist_id>", methods=["POST"])
+def delete_hygienist(hygienist_id):
+    hygienist = Hygienist.query.get_or_404(hygienist_id)
+    db.session.delete(hygienist)
+    db.session.commit()
+    return redirect(url_for("list_hygienists"))
+
+
 # ------------ ОБУЧЕНИЯ / ЭКЗАМЕНЫ ------------
 
 
@@ -362,10 +437,16 @@ def list_trainings():
 def new_training():
     participants = Participant.query.order_by(Participant.full_name).all()
     programs = Program.query.order_by(Program.name).all()
+    hygienists = Hygienist.query.order_by(
+        Hygienist.is_active.desc(),
+        Hygienist.full_name
+    ).all()
 
     if request.method == "POST":
         participant_id = int(request.form.get("participant_id"))
         program_id = int(request.form.get("program_id"))
+        hygienist_id = request.form.get("hygienist_id")
+        hygienist_id = int(hygienist_id) if hygienist_id else None
 
         training_start_date_str = request.form.get("training_start_date")
         training_end_date_str = request.form.get("training_end_date")
@@ -401,6 +482,7 @@ def new_training():
         t = Training(
             participant_id=participant_id,
             program_id=program_id,
+            hygienist_id=hygienist_id,
             training_start_date=training_start_date,
             training_end_date=training_end_date,
             exam_date=exam_date,
@@ -419,6 +501,7 @@ def new_training():
         training=None,
         participants=participants,
         programs=programs,
+        hygienists=hygienists,
         action_url=url_for("new_training"),
         submit_label="Сохранить",
     )
@@ -429,10 +512,16 @@ def edit_training(training_id):
     training = Training.query.get_or_404(training_id)
     participants = Participant.query.order_by(Participant.full_name).all()
     programs = Program.query.order_by(Program.name).all()
+    hygienists = Hygienist.query.order_by(
+        Hygienist.is_active.desc(),
+        Hygienist.full_name
+    ).all()
 
     if request.method == "POST":
         training.participant_id = int(request.form.get("participant_id"))
         training.program_id = int(request.form.get("program_id"))
+        hygienist_id = request.form.get("hygienist_id")
+        training.hygienist_id = int(hygienist_id) if hygienist_id else None
 
         training_start_date_str = request.form.get("training_start_date")
         training_end_date_str = request.form.get("training_end_date")
@@ -479,6 +568,7 @@ def edit_training(training_id):
         training=training,
         participants=participants,
         programs=programs,
+        hygienists=hygienists,
         action_url=url_for("edit_training", training_id=training_id),
         submit_label="Обновить",
     )

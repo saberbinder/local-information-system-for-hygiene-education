@@ -151,39 +151,8 @@
         font-size: 11pt;
     }
 
-    .sign-right{
-        width: 20%;
-        text-align: right;
-        position: relative;
-        top: 10mm;           /* ← опускает М.П. вниз */
-    }
-
-
-
-
     .sign-label {
         margin-right: 6px;
-    }
-
-    .line {
-        display: inline-block;
-        border-bottom: 1px solid #000;
-        height: 1.3em;
-        vertical-align: bottom;
-    }
-
-    .line-name {
-        width: 75mm;   /* место для ФИО */
-        margin-right: 6px;
-    }
-
-    .line-sign {
-        width: 30mm;   /* подпись */
-        margin-left: 6px;
-    }
-
-    .slash {
-        margin: 0 6px;
     }
 
 </style>
@@ -254,11 +223,10 @@
         <div class="sign-row">
             <div class="sign-left">
             <span class="sign-label">Гигиенист-эпидемиолог:</span>
-            <span class="line line-name"></span>
-            <span class="slash">/</span>
-            <span class="line line-sign"></span>
+            <span class="cert-field-label">
+                {{ training.hygienist.full_name if training.hygienist else "____________________" }}
+            </span>
             </div>
-            <div class="sign-right">М.П.</div>
         </div>
         </div>
 

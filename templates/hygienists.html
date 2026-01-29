@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Гигиенисты-эпидемиологи</h2>
+<p><a class="btn btn-primary" href="{{ url_for('new_hygienist') }}">Добавить специалиста</a></p>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>ФИО</th>
+        <th>Активен</th>
+        <th>Изменить</th>
+        <th>Удалить</th>
+    </tr>
+    {% for h in hygienists %}
+    <tr>
+        <td>{{ h.id }}</td>
+        <td>{{ h.full_name }}</td>
+        <td>{{ "Да" if h.is_active else "Нет" }}</td>
+        <td>
+            <a class="btn btn-secondary"
+               href="{{ url_for('edit_hygienist', hygienist_id=h.id) }}">Изменить</a>
+        </td>
+        <td>
+            <form method="post"
+                  action="{{ url_for('delete_hygienist', hygienist_id=h.id) }}"
+                  onsubmit="return confirm('Удалить специалиста?');">
+                <button class="btn btn-danger" type="submit">X</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

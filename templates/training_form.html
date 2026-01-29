@@ -30,6 +30,19 @@
     </div>
 
     <div class="form-row">
+        <label>Гигиенист-эпидемиолог</label>
+        <select name="hygienist_id">
+            <option value="">-- не выбран --</option>
+            {% for h in hygienists %}
+            <option value="{{ h.id }}"
+                {% if training and training.hygienist_id == h.id %}selected{% endif %}>
+                {{ h.full_name }}{% if not h.is_active %} (неактивен){% endif %}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-row">
         <label>Дата начала обучения</label>
         <input type="date" name="training_start_date"
                value="{{ training.training_start_date.strftime('%Y-%m-%d') if training and training.training_start_date else '' }}">
